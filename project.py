@@ -1,5 +1,7 @@
 #Project 
 
+import pandas as pd
+
 #Functions
 #read file
 #add node --
@@ -68,6 +70,7 @@ class max_heap:
 
         return root
     
-################################################################################
+###############################s#################################################
 
 def open_file(): 
+    data = pd.read_excel("Project.xlsx")
