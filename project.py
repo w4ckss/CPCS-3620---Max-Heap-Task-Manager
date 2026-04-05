@@ -74,3 +74,10 @@ class max_heap:
 
 def open_file(): 
     data = pd.read_excel("Project.xlsx")
+
+    print(data.head())
+    row = data.iloc[1]   # to get the information
+    print(row) 
+    print(data.loc[1, "Importance"])   # to acess the column from the row
+
+open_file()
