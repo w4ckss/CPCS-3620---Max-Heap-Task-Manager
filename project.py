@@ -18,18 +18,18 @@ class max_heap:
 
     def heapify_up(self, index):             # arranging upwards
         while index > 0:                     # as long as index is not root node
-            parent = (index - 1) // 3        # parent node
+            parent = (index - 1) // 2        # parent node
 
-            if self.heap[index] > self.heap[parent]:    # if the current is child is bigger than the parent
-                temp = self.heap[index] 
+            if self.heap[index][0] > self.heap[parent][0]:    # if the current is child is bigger than the parent
+                temp = self.heap[index]
                 self.heap[index] = self.heap[parent]    #swap places
                 self.heap[parent] = temp
             else:
                 break                                   # if everything is good break
 
-    def insert(self, value):                            # adding a task
-        self.heap.append(value)                         # add to the end of the heap list
-        self.heap.heapify_up(len(self.heap) - 1)        # heapify up
+    def insert(self, key, value):                            # adding a task
+        self.heap.append((key, value))                       # add to the end of the heap list (tuple)
+        self.heapify_up(len(self.heap) - 1)        # heapify up
 
     def heapify_down(self, index):                      # heapify down
         size = len(self.heap)                           # size of the heap
@@ -39,10 +39,10 @@ class max_heap:
             left_child = (2 * index) + 1                # formula for left child
             right_child = (2 * index) + 2               # formula for right child
 
-            if left_child < size and self.heap[left_child] > self.heap[right_child]:      # if valid + if left > right 
+            if left_child < size and self.heap[left_child][0] > self.heap[right_child][0]:      # if valid + if left > right 
                 largest = left_child                    # assign left as largest
 
-            if right_child < size and self.heap[left_child] < self.heap[right_child]:     # if valid + right > left
+            if right_child < size and self.heap[left_child][0] < self.heap[right_child][0]:     # if valid + right > left
                 largest = right_child                   # assign left as larges
 
             if largest != index:                        # if largest is not the current one
@@ -70,14 +70,44 @@ class max_heap:
 
         return root
     
+    def print_first(self):
+        print(f"The first taks that you should do is: {self.heap[0]}")
+
+    def print_all(self):
+        for i in range(len(self.heap) - 1):
+            print(f"Priority Level: {self.heap[i][0]}, Task Name: {self.heap[i][1]}")
+
 ###############################s#################################################
 
-def open_file(): 
-    data = pd.read_excel("Project.xlsx")
+data = pd.read_excel("Project.xlsx")     # read excel file
+print(data.head())
 
-    print(data.head())
-    row = data.iloc[1]   # to get the information
-    print(row) 
-    print(data.loc[1, "Importance"])   # to acess the column from the row
 
-open_file()
+row = data.iloc[1]   # to get the information of a row (start at index = 1)
+print(row) 
+print(data.loc[1, "Importance"])   # to acess the column from the row
+numrows = data.shape[0]
+print(numrows)
+
+heap = max_heap()
+
+for i in range(numrows):
+    importance = float(data.loc[i, "Importance"])
+    deadline = float(data.loc[i, "Deadline"])
+    time = float(data.loc[i, "Estimated Time"])
+    name = (data.loc[i, "Task Name"])
+
+    # NORMAlIZATION
+
+    importance = (importance/10)
+    deadline = (1/deadline)
+    time = (time/360)
+
+    # MATH FOR PRIORITY LEVEL
+
+    priority = 0.4*deadline + 0.4*importance + 0.2*time
+
+    heap.insert(priority, name)
+
+heap.print_first()
+heap.print_all()
