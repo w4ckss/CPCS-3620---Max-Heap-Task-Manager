@@ -1,16 +1,11 @@
-#Project 
+# This is the Code for the Computer Science 3620 Winter 2026 Semester Final Project
+#  
+# This project is a task scheduling system using a max heap data sturcture
+# The tasks are read from an xlsx file with assigned name, importance, deadline, and estimated time
+# and uses statistical weighted scoring model where all values are normalized and the weights of the 
+# varibales are 40% for importance, 40% for deadline, and 20% for estimated time totalling 100%.
 
 import pandas as pd
-
-#Functions
-#read file
-#add node --
-#remove node --
-#print node
-#data normalization
-#calculation
-
-#Max Heap Class:
 
 class max_heap:
     def __init__(self):   #constructor
@@ -24,6 +19,8 @@ class max_heap:
                 temp = self.heap[index]
                 self.heap[index] = self.heap[parent]    #swap places
                 self.heap[parent] = temp
+
+                index = parent
             else:
                 break                                   # if everything is good break
 
@@ -39,14 +36,14 @@ class max_heap:
             left_child = (2 * index) + 1                # formula for left child
             right_child = (2 * index) + 2               # formula for right child
 
-            if left_child < size and self.heap[left_child][0] > self.heap[right_child][0]:      # if valid + if left > right 
+            if left_child < size and self.heap[left_child][0] > self.heap[largest][0]:      # if valid + if left > right 
                 largest = left_child                    # assign left as largest
 
-            if right_child < size and self.heap[left_child][0] < self.heap[right_child][0]:     # if valid + right > left
+            if right_child < size and self.heap[largest][0] < self.heap[right_child][0]:     # if valid + right > left
                 largest = right_child                   # assign left as larges
 
             if largest != index:                        # if largest is not the current one
-                temp = self.heap[largest]               # swap the current index with the largest if not equal
+                temp = self.heap[index]               # swap the current index with the largest if not equal
                 self.heap[index] = self.heap[largest]
                 self.heap[largest] = temp
 
@@ -71,43 +68,54 @@ class max_heap:
         return root
     
     def print_first(self):
-        print(f"The first taks that you should do is: {self.heap[0]}")
+        if len(self.heap) != 0:
+            print(f"\nThe first taks that you should do is: {self.heap[0]}")
+        else:
+            return
 
     def print_all(self):
         for i in range(len(self.heap) - 1):
-            print(f"Priority Level: {self.heap[i][0]}, Task Name: {self.heap[i][1]}")
+            print(f"\nPriority Level: {self.heap[i][0]}, Task Name: {self.heap[i][1]}")
 
 ###############################s#################################################
 
 data = pd.read_excel("Project.xlsx")     # read excel file
-print(data.head())
-
-
-row = data.iloc[1]   # to get the information of a row (start at index = 1)
-print(row) 
-print(data.loc[1, "Importance"])   # to acess the column from the row
 numrows = data.shape[0]
-print(numrows)
+heap = max_heap() 
 
-heap = max_heap()
-
+# Calculations for the impoirtance level that will be used to compare which task should
+# be prioritized first
 for i in range(numrows):
     importance = float(data.loc[i, "Importance"])
     deadline = float(data.loc[i, "Deadline"])
     time = float(data.loc[i, "Estimated Time"])
     name = (data.loc[i, "Task Name"])
 
-    # NORMAlIZATION
+    # NORMAlIZATION: Putting all data in the same unit for accurate comparison
 
     importance = (importance/10)
     deadline = (1/deadline)
     time = (time/360)
 
-    # MATH FOR PRIORITY LEVEL
+    # MATH FOR PRIORITY LEVEL: Assining data to the right weight
 
     priority = 0.4*deadline + 0.4*importance + 0.2*time
 
+    # insert the priority value and the name of the task
     heap.insert(priority, name)
 
-heap.print_first()
 heap.print_all()
+flag = True
+while flag:
+    heap.print_first()
+    while flag:
+        answer = input("Are you ready to move to the next task? (Y/N)")
+        if (answer == 'Y' or answer == 'y'):
+            heap.remove_root()
+            if len(heap.heap) == 0:
+                flag = False
+            break
+        else:
+            print("Complete the task first")
+
+print("\nCONGRATULATIONS YOU FINISHED ALL YOU TASKS!!!")
