@@ -3,7 +3,7 @@
 # This project is a task scheduling system using a max heap data sturcture
 # The tasks are read from an xlsx file with assigned name, importance, deadline, and estimated time
 # and uses statistical weighted scoring model where all values are normalized and the weights of the 
-# varibales are 40% for importance, 40% for deadline, and 20% for estimated time totalling 100%.
+# varibales are determined by the user.
 
 import pandas as pd
 
@@ -69,7 +69,7 @@ class max_heap:
     
     def print_first(self):
         if len(self.heap) != 0:
-            print(f"\nThe first taks that you should do is: {self.heap[0]}")
+            print(f"\nThe task that you should prioritize is: {self.heap[0]}")
         else:
             return
 
@@ -78,6 +78,39 @@ class max_heap:
             print(f"\nPriority Level: {self.heap[i][0]}, Task Name: {self.heap[i][1]}")
 
 ###############################s#################################################
+total = 100
+print(f"How would you like to weigh your variables? Current total: {total}")
+
+while True:
+    Imp_Weight = float(input(f"\nEnter the weight for Importance (out of {total}): "))
+    if total  == 0 or total < 1:
+        print("Please provide a valid weight.")
+    elif Imp_Weight < 1 or Imp_Weight > 100:
+        print("Please provide a valid weight.")
+    elif Imp_Weight == total:
+        print("Please make space for other variables (Deadline and Time)")
+    else:
+        print
+        total = total - Imp_Weight
+        break
+
+while True:
+    Dead_Weight = float(input(f"\nEnter the weight for Deadline (out of {total}): "))
+    if total == 0 or total < 1:
+        print("Please provide a valid weight.")
+    elif Dead_Weight < 1 or Dead_Weight > 100:
+        print("Please provide a valid weight.")
+    elif Dead_Weight == total:
+        print("Please make space for other variables (Time)")
+    else:
+        Time_Weight = total - Dead_Weight
+        break
+
+print(f"The rest of the weight will be for estinated time which is: {Time_Weight}")
+
+Imp_Weight = Imp_Weight*0.01
+Dead_Weight = Dead_Weight*0.01
+Time_Weight = Time_Weight*0.01
 
 data = pd.read_excel("Project.xlsx")     # read excel file
 numrows = data.shape[0]
@@ -99,7 +132,8 @@ for i in range(numrows):
 
     # MATH FOR PRIORITY LEVEL: Assining data to the right weight
 
-    priority = 0.4*deadline + 0.4*importance + 0.2*time
+    priority = Dead_Weight*deadline + Imp_Weight*importance + Time_Weight*time
+    priority = round(priority, 4)
 
     # insert the priority value and the name of the task
     heap.insert(priority, name)
@@ -109,7 +143,7 @@ flag = True
 while flag:
     heap.print_first()
     while flag:
-        answer = input("Are you ready to move to the next task? (Y/N)")
+        answer = input("Are you ready to move to the next task? (Y/N): ")
         if (answer == 'Y' or answer == 'y'):
             heap.remove_root()
             if len(heap.heap) == 0:
