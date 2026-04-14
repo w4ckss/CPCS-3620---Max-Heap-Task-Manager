@@ -77,12 +77,15 @@ class max_heap:
         for i in range(len(self.heap) - 1):
             print(f"\nPriority Level: {self.heap[i][0]}, Task Name: {self.heap[i][1]}")
 
-###############################s#################################################
-total = 100
-print(f"How would you like to weigh your variables? Current total: {total}")
+#################################################################################
+######################## Main Program Logic #####################################
 
+total = 100                              # Equivalent to 100%
+print(f"How would you like to weigh your variables? Current total: {total}%")
+
+# Loop for user input for the weight of Importance
 while True:
-    Imp_Weight = float(input(f"\nEnter the weight for Importance (out of {total}): "))
+    Imp_Weight = float(input(f"\nEnter the weight for Importance (out of {total}%): "))
     if total  == 0 or total < 1:
         print("Please provide a valid weight.")
     elif Imp_Weight < 1 or Imp_Weight > 100:
@@ -94,8 +97,9 @@ while True:
         total = total - Imp_Weight
         break
 
+# Loop for user input for the weight of Deadline
 while True:
-    Dead_Weight = float(input(f"\nEnter the weight for Deadline (out of {total}): "))
+    Dead_Weight = float(input(f"\nEnter the weight for Deadline (out of {total}%): "))
     if total == 0 or total < 1:
         print("Please provide a valid weight.")
     elif Dead_Weight < 1 or Dead_Weight > 100:
@@ -103,22 +107,34 @@ while True:
     elif Dead_Weight == total:
         print("Please make space for other variables (Time)")
     else:
-        Time_Weight = total - Dead_Weight
+        Time_Weight = total - Dead_Weight # Remaining weight is given to the Time
         break
 
-print(f"The rest of the weight will be for estinated time which is: {Time_Weight}")
+total = Dead_Weight + Time_Weight + Imp_Weight  # To get total weight
 
+# The rest of the weight is allocated to Time
+print(f"The rest of the weight will be for estinated time which is: {Time_Weight}%")
+
+# Confirmation of weights and user input
+print("Here are the weights:")
+print(f"     Importance: {Imp_Weight}%")
+print(f"     Deadline: {Dead_Weight}%")
+print(f"     Estimated Time: {Time_Weight}%")
+print(f"     Total Weight: {total}%")
+
+# Weighting convertion to decimal numbers
 Imp_Weight = Imp_Weight*0.01
 Dead_Weight = Dead_Weight*0.01
 Time_Weight = Time_Weight*0.01
 
 data = pd.read_excel("Project.xlsx")     # read excel file
-numrows = data.shape[0]
-heap = max_heap() 
+numrows = data.shape[0]                  # number of rows
+heap = max_heap()                        # heap initialization
 
 # Calculations for the impoirtance level that will be used to compare which task should
 # be prioritized first
-for i in range(numrows):
+for i in range(numrows):                 # Iterate through each task
+    # Take values of each task
     importance = float(data.loc[i, "Importance"])
     deadline = float(data.loc[i, "Deadline"])
     time = float(data.loc[i, "Estimated Time"])
@@ -130,19 +146,20 @@ for i in range(numrows):
     deadline = (1/deadline)
     time = (time/360)
 
-    # MATH FOR PRIORITY LEVEL: Assining data to the right weight
+    # MATH FOR PRIORITY LEVEL: Assigning data to the right weight
 
     priority = Dead_Weight*deadline + Imp_Weight*importance + Time_Weight*time
-    priority = round(priority, 4)
+    priority = round(priority, 4)         # Rounding for cleaner result
 
     # insert the priority value and the name of the task
     heap.insert(priority, name)
 
-heap.print_all()
-flag = True
+heap.print_all()                          # Print all tasks for confirmation
+flag = True                               # used for loop
 while flag:
-    heap.print_first()
+    heap.print_first()                    # Print the prioritized task
     while flag:
+        # Loop for user input 
         answer = input("Are you ready to move to the next task? (Y/N): ")
         if (answer == 'Y' or answer == 'y'):
             heap.remove_root()
@@ -152,4 +169,4 @@ while flag:
         else:
             print("Complete the task first")
 
-print("\nCONGRATULATIONS YOU FINISHED ALL YOU TASKS!!!")
+print("\nCONGRATULATIONS YOU FINISHED ALL YOU TASKS!!!")  # If all tasks are finished
